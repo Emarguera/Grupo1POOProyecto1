@@ -94,4 +94,8 @@ public class FinalUserController {
         System.out.println("\n👤 Final User Summary:");
         System.out.println(user);
     }
+    
+    public List<Song> getCatalogSongs() {
+    return system.getCatalog().getSongs();
+    }
 }
