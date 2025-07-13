@@ -52,39 +52,54 @@ public class MainView {
             }
         }
     }
+   private static String pedirNombreConValidacion(String mensaje) {
+    String input;
+    do {
+        input = JOptionPane.showInputDialog(mensaje);
+        if (input == null) {
+            // El usuario presionó cancelar, salir o retornar null si quieres
+            return null;
+        }
+        input = input.trim();
+        if (input.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "⚠️ El campo no puede estar vacío. Intenta de nuevo.");
+        }
+    } while (input.isEmpty());
 
-    private static void launchAdmin(MusicSystem system) {
-        String nameInput = JOptionPane.showInputDialog("👨‍💼 Nombre del Administrador:");
-        if (nameInput == null || nameInput.isBlank()) return; //Para pruebas
-
-        Admin admin = new Admin(
-            "admin1",                         // id
-            "admin@example.com",             // email
-            "secure123",                     // password
-            new Name(nameInput, ""),     // utils.Name (first, last)
-            LocalDate.of(1990, 1, 1),        // fechaNacimiento
-            "Costa Rica",                    // nacionalidad
-            new Image("admin.jpg")           // utils.Image
-        );
-
-        AdminController controller = new AdminController(admin, system);
-        AdminView view = new AdminView(controller);
-        view.displayMainMenu();
+    return input;
     }
 
+    private static void launchAdmin(MusicSystem system) {
+    String nameInput = pedirNombreConValidacion("👨‍💼 Nombre del Administrador:");
+    if (nameInput == null) return; // Usuario canceló
+
+    Admin admin = new Admin(
+        "admin1",
+        "admin@example.com",
+        "secure123",
+        new Name(nameInput, ""),
+        LocalDate.of(1990, 1, 1),
+        "Costa Rica",
+        new Image("admin.jpg")
+    );
+
+    AdminController controller = new AdminController(admin, system);
+    AdminView view = new AdminView(controller);
+    view.displayMainMenu();
+    }
 
     private static void launchFinalUser(MusicSystem system) {
-        String nameInput = JOptionPane.showInputDialog("👤 Nombre del Usuario Final:");
-        if (nameInput == null || nameInput.isBlank()) return;
+        String nameInput = pedirNombreConValidacion("👤 Nombre del Usuario Final:");
+        if (nameInput == null) return; // Usuario canceló
 
         FinalUser user = new FinalUser(
-            "user1",                          // id
-            "user@example.com",              // email
-            "pass123",                       // password
-            new Name(nameInput, ""),     // utils.Name (first, last)
-            LocalDate.of(2000, 5, 10),       // fechaNacimiento
-            "Costa Rica",                    // nacionalidad
-            new Image("user.jpg")            // utils.Image
+            "user1",
+            "user@example.com",
+            "pass123",
+            new Name(nameInput, ""),
+            LocalDate.of(2000, 5, 10),
+            "Costa Rica",
+            new Image("user.jpg")
         );
 
         FinalUserController controller = new FinalUserController(user, system);

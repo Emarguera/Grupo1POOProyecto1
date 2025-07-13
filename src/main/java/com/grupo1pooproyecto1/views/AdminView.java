@@ -94,8 +94,8 @@ public class AdminView {
         String title = JOptionPane.showInputDialog("🎵 Ingrese el título de la canción:");
         if (title == null || title.isBlank()) return;
 
-        String[] genreOptions = {"POP", "ROCK", "RAP", "REGGAETON", "CLASICA", "ELECTRONICA", "JAZZ", "SALSA"};
-        String genreStr = (String) JOptionPane.showInputDialog(
+        String[] genreOptions = {"POP", "JAZZ", "CLASSICAL", "HIPHOP", "ELECTRONICA", "COUNTRY", "REGGAE", "METAL", "OTHER"};
+        String genreStr = (String) JOptionPane.showInputDialog(   
                 null,
                 "Seleccione el género:",
                 "Género",
