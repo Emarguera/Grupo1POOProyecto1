@@ -11,6 +11,7 @@ import com.grupo1pooproyecto1.controllers.FinalUserController;
 import com.grupo1pooproyecto1.system.MusicSystem;
 import com.grupo1pooproyecto1.utils.Image;
 import com.grupo1pooproyecto1.utils.Name;
+import com.grupo1pooproyecto1.system.DummyDataLoader;
 
 import javax.swing.JOptionPane;
 import java.time.LocalDate;
@@ -21,7 +22,8 @@ import java.time.LocalDate;
 public class MainView {
    public static void main(String[] args) {
         MusicSystem system = new MusicSystem(); // Shared system for both user types
-
+        DummyDataLoader.load(system);
+        
         boolean running = true;
 
         while (running) {
