@@ -14,7 +14,7 @@ public enum Genre {
     JAZZ,
     CLASSICAL,
     HIPHOP,
-    ELECTRONIC,
+    ELECTRONICA,
     COUNTRY,
     REGGAE,
     METAL,

@@ -7,12 +7,13 @@ package com.grupo1pooproyecto1.system;
 import com.grupo1pooproyecto1.models.User;
 import com.grupo1pooproyecto1.models.Admin;
 import com.grupo1pooproyecto1.models.Catalog;
-import com.grupo1pooproyecto1.models.Song;
 import com.grupo1pooproyecto1.services.Top5Manager;
+import com.grupo1pooproyecto1.utils.Image;
+import com.grupo1pooproyecto1.utils.Name;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  *
  * @author estebanruiz
@@ -27,12 +28,23 @@ public class MusicSystem {
         this.users = new ArrayList<>();
         this.catalog = new Catalog();
         this.top5Lists = new Top5Manager();
+
+        // Admin quemado (hardcoded)
+        this.admin = new Admin(
+            "admin1",
+            "admin@example.com",
+            "adminpass",
+            new Name("Admin", "Root"),
+            LocalDate.of(1990, 1, 1),
+            "Costa Rica",
+            new Image("admin.png")
+        );
     }
 
     public boolean registerUser(User newUser) {
         for (User u : users) {
             if (u.getUsername().equalsIgnoreCase(newUser.getUsername())) {
-                return false; // username already exists
+                return false; // El nombre de usuario ya existe
             }
         }
         users.add(newUser);
@@ -40,6 +52,10 @@ public class MusicSystem {
     }
 
     public User login(String username, String password) {
+        if (admin != null && admin.getUsername().equals(username) && admin.getPassword().equals(password)) {
+            return admin;
+        }
+
         for (User u : users) {
             if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
                 return u;
