@@ -21,7 +21,7 @@ public class FinalUserView {
         this.controller = controller;
     }
 
-    public void showMenu() {
+    public void displayUserMenu() {
         boolean running = true;
 
         while (running) {
