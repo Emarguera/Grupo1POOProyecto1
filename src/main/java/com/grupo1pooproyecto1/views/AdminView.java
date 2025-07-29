@@ -113,18 +113,11 @@ public class AdminView {
         String album = JOptionPane.showInputDialog("Ingrese el álbum:");
         if (album == null || album.isBlank()) return;
 
-        String releaseStr = JOptionPane.showInputDialog("Ingrese la fecha de lanzamiento (YYYY-MM-DD):");
-        if (releaseStr == null) return;
-        LocalDate releaseDate = LocalDate.parse(releaseStr);
-
-        String duration = JOptionPane.showInputDialog("Ingrese la duración (ej: 3:45):");
-        if (duration == null || duration.isBlank()) return;
-
         String priceStr = JOptionPane.showInputDialog("Ingrese el precio:");
         if (priceStr == null) return;
         double price = Double.parseDouble(priceStr);
 
-        Song song = new Song(title, genre, artist, album, releaseDate, duration, price);
+        Song song = new Song(title, genre, artist, album, price);
         controller.uploadSong(song);
 
         JOptionPane.showMessageDialog(null, "✅ Canción subida correctamente.");

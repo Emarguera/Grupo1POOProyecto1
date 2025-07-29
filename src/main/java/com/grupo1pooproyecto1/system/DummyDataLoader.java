@@ -24,8 +24,6 @@ public class DummyDataLoader {
             Genre.ROCK,
             "Queen",
             "A Night at the Opera",
-            LocalDate.of(1975, 11, 21),
-            "Classic rock masterpiece",
             1.99
         ));
 
@@ -34,8 +32,6 @@ public class DummyDataLoader {
             Genre.CLASSICAL,  // Usa el enum correcto
             "Debussy",
             "Suite Bergamasque",
-            LocalDate.of(1905, 1, 1),
-            "Piano solo",
             0.99
         ));
         
@@ -44,8 +40,6 @@ public class DummyDataLoader {
             Genre.POP,  // Usa el enum correcto
             "Tame Impala",
             "Inner Speaker",
-            LocalDate.of(2005, 1, 1),
-            "Electronic",
             0.50
         ));
         
@@ -54,8 +48,6 @@ public class DummyDataLoader {
             Genre.ROCK,  // Usa el enum correcto
             "Pearl Jam",
             "Riot Act",
-            LocalDate.of(2000, 1, 1),
-            "Master",
             1.50
         ));
 

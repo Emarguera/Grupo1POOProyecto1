@@ -49,7 +49,6 @@ public class Catalog {
             .filter(song ->
                 song.getTitle().toLowerCase().contains(lowerCriteria) ||
                 song.getArtist().toLowerCase().contains(lowerCriteria) ||
-                song.getComposer().toLowerCase().contains(lowerCriteria) ||
                 song.getAlbum().toLowerCase().contains(lowerCriteria)
             )
             .collect(Collectors.toList());

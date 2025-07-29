@@ -7,7 +7,6 @@ package com.grupo1pooproyecto1.models;
 import com.grupo1pooproyecto1.enums.Genre;
 import com.grupo1pooproyecto1.interfaces.Playable;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
       
@@ -19,21 +18,16 @@ public class Song implements Playable {
     private String title;
     private Genre genre;
     private String artist;
-    private String composer;
-    private LocalDate releaseDate;
     private String album;
     private double price;
     private List<Integer> ratings;
     private int purchaseCount;
     private int playlistInclusionCount;
 
-    public Song(String title, Genre genre, String artist, String composer,
-                LocalDate releaseDate, String album, double price) {
+    public Song(String title, Genre genre, String artist, String album, double price) {
         this.title = title;
         this.genre = genre;
         this.artist = artist;
-        this.composer = composer;
-        this.releaseDate = releaseDate;
         this.album = album;
         this.price = price;
         this.ratings = new ArrayList<>();
@@ -81,34 +75,6 @@ public class Song implements Playable {
      */
     public void setArtist(String artist) {
         this.artist = artist;
-    }
-
-    /**
-     * @return the composer
-     */
-    public String getComposer() {
-        return composer;
-    }
-
-    /**
-     * @param composer the composer to set
-     */
-    public void setComposer(String composer) {
-        this.composer = composer;
-    }
-
-    /**
-     * @return the releaseDate
-     */
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    /**
-     * @param releaseDate the releaseDate to set
-     */
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
     }
 
     /**
