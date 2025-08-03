@@ -19,45 +19,45 @@ import java.time.LocalDate;
 public class DummyDataLoader {
     public static void load(MusicSystem system) {
         // Crear canciones dummy y agregarlas al catálogo
-        system.getCatalog().addSong(new Song(
-            "Bohemian Rhapsody",
-            Genre.ROCK,
-            "Queen",
-            "A Night at the Opera",
-            LocalDate.of(1975, 11, 21),
-            "Classic rock masterpiece",
-            1.99
-        ));
-
-        system.getCatalog().addSong(new Song(
-            "Clair de Lune",
-            Genre.CLASSICAL,  // Usa el enum correcto
-            "Debussy",
-            "Suite Bergamasque",
-            LocalDate.of(1905, 1, 1),
-            "Piano solo",
-            0.99
-        ));
-        
-        system.getCatalog().addSong(new Song(
-            "Solitude is Bliss",
-            Genre.POP,  // Usa el enum correcto
-            "Tame Impala",
-            "Inner Speaker",
-            LocalDate.of(2005, 1, 1),
-            "Electronic",
-            0.50
-        ));
-        
-         system.getCatalog().addSong(new Song(
-            "I Am Mine",
-            Genre.ROCK,  // Usa el enum correcto
-            "Pearl Jam",
-            "Riot Act",
-            LocalDate.of(2000, 1, 1),
-            "Master",
-            1.50
-        ));
+//        system.getCatalog().addSong(new Song(
+//            "Bohemian Rhapsody",
+//            Genre.ROCK,
+//            "Queen",
+//            "A Night at the Opera",
+//            LocalDate.of(1975, 11, 21),
+//            "Classic rock masterpiece",
+//            1.99
+//        ));
+//
+//        system.getCatalog().addSong(new Song(
+//            "Clair de Lune",
+//            Genre.CLASSICAL,  // Usa el enum correcto
+//            "Debussy",
+//            "Suite Bergamasque",
+//            LocalDate.of(1905, 1, 1),
+//            "Piano solo",
+//            0.99
+//        ));
+//        
+//        system.getCatalog().addSong(new Song(
+//            "Solitude is Bliss",
+//            Genre.POP,  // Usa el enum correcto
+//            "Tame Impala",
+//            "Inner Speaker",
+//            LocalDate.of(2005, 1, 1),
+//            "Electronic",
+//            0.50
+//        ));
+//        
+//         system.getCatalog().addSong(new Song(
+//            "I Am Mine",
+//            Genre.ROCK,  // Usa el enum correcto
+//            "Pearl Jam",
+//            "Riot Act",
+//            LocalDate.of(2000, 1, 1),
+//            "Master",
+//            1.50
+//        ));
 
         // Reemplazar admin quemado si deseas (opcional)
         Admin dummyAdmin = new Admin(

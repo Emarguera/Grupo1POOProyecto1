@@ -72,7 +72,7 @@ public class MainView {
     }
 
     private static void launchAdmin(MusicSystem system) {
-    String nameInput = pedirNombreConValidacion("👨‍💼 Nombre del Administrador:");
+    String nameInput = pedirNombreConValidacion("Nombre del Administrador:");
     if (nameInput == null) return; // Usuario canceló
 
     Admin admin = new Admin(
@@ -91,7 +91,7 @@ public class MainView {
     }
 
     private static void launchFinalUser(MusicSystem system) {
-        String nameInput = pedirNombreConValidacion("👤 Nombre del Usuario Final:");
+        String nameInput = pedirNombreConValidacion("Nombre del Usuario Final:");
         if (nameInput == null) return; // Usuario canceló
 
         FinalUser user = new FinalUser(

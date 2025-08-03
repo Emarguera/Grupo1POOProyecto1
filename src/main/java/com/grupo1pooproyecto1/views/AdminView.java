@@ -3,10 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.grupo1pooproyecto1.views;
+import com.grupo1pooproyecto1.views.songDAOtest;
 
 import com.grupo1pooproyecto1.controllers.AdminController;
 import com.grupo1pooproyecto1.models.Song;
 import com.grupo1pooproyecto1.enums.Genre;
+
 
 import java.time.LocalDate;
 import javax.swing.JOptionPane;
@@ -55,18 +57,20 @@ public class AdminView {
     }
 
     private void handleOption(char option) {
+        songDAOtest test = new songDAOtest();
+
         switch (option) {
             case '1':
-                showCatalog();
+                test.showSongCatalog();
                 break;
             case '2':
-                uploadSong();
+                test.addSongTest();
                 break;
             case '3':
-                eliminateSong();
+                test.deleteSong();
                 break;
             case '4':
-                showTop5();
+                test.editSong();
                 break;
             default:
                 JOptionPane.showMessageDialog(null, "Opción inválida.");
@@ -76,11 +80,11 @@ public class AdminView {
     private void showCatalog() {
         List<Song> songs = controller.getCatalogSongs();
         if (songs.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "🎵 El catálogo está vacío.");
+            JOptionPane.showMessageDialog(null, "El catálogo está vacío.");
             return;
         }
 
-        StringBuilder sb = new StringBuilder("🎵 Catálogo:\n");
+        StringBuilder sb = new StringBuilder("Catálogo:\n");
         int index = 1;
         for (Song s : songs) {
             sb.append(String.format("%d. %s - %s ($%.2f, %.1f★)\n",
@@ -91,7 +95,7 @@ public class AdminView {
 
     private void uploadSong() {
         try {
-        String title = JOptionPane.showInputDialog("🎵 Ingrese el título de la canción:");
+        String title = JOptionPane.showInputDialog("Ingrese el título de la canción:");
         if (title == null || title.isBlank()) return;
 
         String[] genreOptions = {"POP", "JAZZ", "CLASSICAL", "HIPHOP", "ELECTRONICA", "COUNTRY", "REGGAE", "METAL", "OTHER"};
@@ -124,13 +128,13 @@ public class AdminView {
         if (priceStr == null) return;
         double price = Double.parseDouble(priceStr);
 
-        Song song = new Song(title, genre, artist, album, releaseDate, duration, price);
-        controller.uploadSong(song);
+//        Song song = new Song(title, genre, artist, album, releaseDate, duration, price);
+//        controller.uploadSong(song);
 
         JOptionPane.showMessageDialog(null, "✅ Canción subida correctamente.");
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "❌ Error al subir canción: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al subir canción: " + e.getMessage());
         }
     }
 
@@ -154,9 +158,9 @@ public class AdminView {
             int songIndex = Integer.parseInt(input);
             boolean removed = controller.eliminateSong(songIndex);
             if (removed) {
-                JOptionPane.showMessageDialog(null, "✅ Canción eliminada.");
+                JOptionPane.showMessageDialog(null, "Canción eliminada.");
             } else {
-                JOptionPane.showMessageDialog(null, "❌ Índice inválido.");
+                JOptionPane.showMessageDialog(null, "Índice inválido.");
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Entrada inválida.");
@@ -166,6 +170,6 @@ public class AdminView {
     private void showTop5() {
         // Prints to console — optional: mirror it to GUI if desired later
         controller.showTop5();
-        JOptionPane.showMessageDialog(null, "🔝 Top 5 mostrado por consola.");
+        JOptionPane.showMessageDialog(null, "Top 5 mostrado por consola.");
     }
 }

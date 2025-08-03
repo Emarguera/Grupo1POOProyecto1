@@ -7,7 +7,6 @@ package com.grupo1pooproyecto1.models;
 import com.grupo1pooproyecto1.enums.Genre;
 import com.grupo1pooproyecto1.interfaces.Playable;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
       
@@ -16,30 +15,35 @@ import java.util.List;
  * @author estebanruiz
  */
 public class Song implements Playable {
+
+
+    private int songId;
     private String title;
     private Genre genre;
     private String artist;
-    private String composer;
-    private LocalDate releaseDate;
     private String album;
     private double price;
     private List<Integer> ratings;
     private int purchaseCount;
     private int playlistInclusionCount;
 
-    public Song(String title, Genre genre, String artist, String composer,
-                LocalDate releaseDate, String album, double price) {
+    public Song(int songId,String title, Genre genre, String artist, String album, double price,int purchaseCount, int playlistInclusionCount) {
+        this.songId = songId;
         this.title = title;
         this.genre = genre;
         this.artist = artist;
-        this.composer = composer;
-        this.releaseDate = releaseDate;
         this.album = album;
         this.price = price;
         this.ratings = new ArrayList<>();
         this.purchaseCount = 0;
         this.playlistInclusionCount = 0;
     }
+    
+public Song() {
+
+}
+
+
     
     /**
      * @return the title
@@ -81,34 +85,6 @@ public class Song implements Playable {
      */
     public void setArtist(String artist) {
         this.artist = artist;
-    }
-
-    /**
-     * @return the composer
-     */
-    public String getComposer() {
-        return composer;
-    }
-
-    /**
-     * @param composer the composer to set
-     */
-    public void setComposer(String composer) {
-        this.composer = composer;
-    }
-
-    /**
-     * @return the releaseDate
-     */
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    /**
-     * @param releaseDate the releaseDate to set
-     */
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
     }
 
     /**
@@ -179,6 +155,19 @@ public class Song implements Playable {
      */
     public void setPlaylistInclusionCount(int playlistInclusionCount) {
         this.playlistInclusionCount = playlistInclusionCount;
+    }
+        /**
+     * @return the songId
+     */
+    public int getSongId() {
+        return songId;
+    }
+
+    /**
+     * @param songId the songId to set
+     */
+    public void setSongId(int songId) {
+        this.songId = songId;
     }
 
     public void addRating(int rating) {
