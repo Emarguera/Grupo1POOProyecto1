@@ -11,7 +11,6 @@ import com.grupo1pooproyecto1.controllers.FinalUserController;
 import com.grupo1pooproyecto1.system.MusicSystem;
 import com.grupo1pooproyecto1.utils.Image;
 import com.grupo1pooproyecto1.utils.Name;
-import com.grupo1pooproyecto1.system.DummyDataLoader;
 
 import javax.swing.JOptionPane;
 import java.time.LocalDate;
@@ -22,7 +21,6 @@ import java.time.LocalDate;
 public class MainView {
    public static void main(String[] args) {
         MusicSystem system = new MusicSystem(); // Shared system for both user types
-        DummyDataLoader.load(system);
         
         boolean running = true;
 
@@ -80,7 +78,6 @@ public class MainView {
         "admin@example.com",
         "secure123",
         new Name(nameInput, ""),
-        LocalDate.of(1990, 1, 1),
         "Costa Rica",
         new Image("admin.jpg")
     );
@@ -99,7 +96,6 @@ public class MainView {
             "user@example.com",
             "pass123",
             new Name(nameInput, ""),
-            LocalDate.of(2000, 5, 10),
             "Costa Rica",
             new Image("user.jpg")
         );

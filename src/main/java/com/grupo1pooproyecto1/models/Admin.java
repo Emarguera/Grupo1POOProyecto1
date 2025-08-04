@@ -7,7 +7,6 @@ package com.grupo1pooproyecto1.models;
 import com.grupo1pooproyecto1.utils.Image;
 import com.grupo1pooproyecto1.utils.Name;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,18 +16,15 @@ import java.util.List;
  */
 public class Admin extends User {
     private Name fullName;
-    private LocalDate birthDate;
     private String idNumber;
     private Image avatar;
     private double balance;
     private List<Song> songCollection;
     private List<Playlist> playlists;
 
-    public Admin(String username, String email, String password, Name fullName,
-                 LocalDate birthDate, String idNumber, Image avatar) {
+    public Admin(String username, String email, String password, Name fullName, String idNumber, Image avatar) {
         super(username, email, password);
         this.fullName = fullName;
-        this.birthDate = birthDate;
         this.idNumber = idNumber;
         this.avatar = avatar;
         this.balance = 2.99; //Bonus de Ingreso
@@ -48,20 +44,6 @@ public class Admin extends User {
      */
     public void setFullName(Name fullName) {
         this.fullName = fullName;
-    }
-
-    /**
-     * @return the birthDate
-     */
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    /**
-     * @param birthDate the birthDate to set
-     */
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
     }
 
     /**

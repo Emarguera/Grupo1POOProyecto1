@@ -17,17 +17,15 @@ import java.util.List;
  */
 public class FinalUser extends User {
     private Name fullName;
-    private LocalDate birthDate;
     private String idNumber;
     private Image avatar;
     private double balance;
     private List<Song> songCollection;
     private List<Playlist> playlists;
 
-    public FinalUser(String username, String email, String password, Name fullName, LocalDate birthDate, String idNumber, Image avatar) {
+    public FinalUser(String username, String email, String password, Name fullName, String idNumber, Image avatar) {
         super(username, email, password);
         this.fullName = fullName;
-        this.birthDate = birthDate;
         this.idNumber = idNumber;
         this.avatar = avatar;
         this.balance = 2.99; //Bonus de Ingreso
@@ -47,20 +45,6 @@ public class FinalUser extends User {
      */
     public void setFullName(Name fullName) {
         this.fullName = fullName;
-    }
-
-    /**
-     * @return the birthDate
-     */
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    /**
-     * @param birthDate the birthDate to set
-     */
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
     }
 
     /**
@@ -170,7 +154,6 @@ public class FinalUser extends User {
     return "FinalUser{" +
             "username='" + username + '\'' +
             ", fullName=" + fullName +
-            ", birthDate=" + birthDate +
             ", idNumber='" + idNumber + '\'' +
             ", balance=" + balance +
             ", songCollection=" + songCollection.size() + " songs" +

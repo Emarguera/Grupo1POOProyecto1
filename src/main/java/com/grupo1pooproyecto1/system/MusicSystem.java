@@ -35,7 +35,6 @@ public class MusicSystem {
             "admin@example.com",
             "adminpass",
             new Name("Admin", "Root"),
-            LocalDate.of(1990, 1, 1),
             "Costa Rica",
             new Image("admin.png")
         );
