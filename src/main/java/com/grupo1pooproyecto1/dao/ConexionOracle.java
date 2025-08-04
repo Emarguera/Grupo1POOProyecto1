@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.grupo1pooproyecto1.services;
+package com.grupo1pooproyecto1.dao;
 
 /**
  *
@@ -13,7 +13,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexionOracle {
-    private static final String URL = "jdbc:oracle:thin:@localhost:1521:XE"; // Ajusta si usas otro puerto/SID/servicio
+//    private static final String URL = "jdbc:oracle:thin:@localhost:1521:XE"; // DB de Isaac
+    private static final String URL = "jdbc:oracle:thin:@//192.168.100.182:1521/xe"; // DB de Esteban
     private static final String USER = "system";
     private static final String PASSWORD = "Zapot3";
 

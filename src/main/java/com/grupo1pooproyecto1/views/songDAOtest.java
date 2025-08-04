@@ -2,8 +2,8 @@ package com.grupo1pooproyecto1.views;
 
 import com.grupo1pooproyecto1.enums.Genre;
 import com.grupo1pooproyecto1.models.Song;
-import com.grupo1pooproyecto1.services.SongDAO;
-import com.grupo1pooproyecto1.services.ConexionOracle; 
+import com.grupo1pooproyecto1.dao.SongDAO;
+import com.grupo1pooproyecto1.dao.ConexionOracle; 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -58,7 +58,7 @@ public class songDAOtest {
             );
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Error al acceder a la base de datos: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al acceder a la base de datos: " + e.getMessage());
         }
     }
 //Añadir cancion
@@ -113,14 +113,15 @@ public class songDAOtest {
             try {
                 genre = Genre.valueOf(genreStr.trim().toUpperCase());
             } catch (IllegalArgumentException e) {
-                JOptionPane.showMessageDialog(null, "❌ Género inválido: '" + genreStr + "'");
+                JOptionPane.showMessageDialog(null, "Género inválido: '" + genreStr + "'");
                 return;
             }
             System.out.println("Título: " + title);
+            System.out.println("Género: " + genre);
             System.out.println("Artista: " + artist);
             System.out.println("Álbum: " + album);
             System.out.println("Precio: " + price);
-            System.out.println("Género: " + genre);
+            
 
             // Crear canción y guardar en BD
             Song nueva = new Song(0, title, genre, artist, album, price, 0, 0);
@@ -128,12 +129,12 @@ public class songDAOtest {
             SongDAO dao = new SongDAO(conn);
             dao.insert(nueva);
 
-            JOptionPane.showMessageDialog(null, "✅ Canción agregada correctamente.");
+            JOptionPane.showMessageDialog(null, "Canción agregada correctamente.");
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "❌ Precio inválido.");
+            JOptionPane.showMessageDialog(null, "Precio inválido.");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "❌ Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
 
     }
@@ -146,14 +147,14 @@ public class songDAOtest {
                 SongDAO dao = new SongDAO(ConexionOracle.conectar());
                 boolean deleted = dao.delete(songId);
                 if (deleted) {
-                    JOptionPane.showMessageDialog(null, "✅ Canción eliminada correctamente.");
+                    JOptionPane.showMessageDialog(null, "Canción eliminada correctamente.");
                 } else {
-                    JOptionPane.showMessageDialog(null, "❌ No se encontró canción con ese ID.");
+                    JOptionPane.showMessageDialog(null, "No se encontró canción con ese ID.");
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "❌ ID inválido.");
+                JOptionPane.showMessageDialog(null, "ID inválido.");
             } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "❌ Error en la base de datos: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Error en la base de datos: " + e.getMessage());
             }
         }
     }
@@ -166,7 +167,7 @@ public class songDAOtest {
         SongDAO dao = new SongDAO(ConexionOracle.conectar());
         Song song = dao.findById(songId);  
         if (song == null) {
-            JOptionPane.showMessageDialog(null, "❌ Canción no encontrada.");
+            JOptionPane.showMessageDialog(null, "Canción no encontrada.");
             return;
         }
 
@@ -204,15 +205,15 @@ public class songDAOtest {
 
         boolean actualizado = dao.update(updatedSong);
         if (actualizado) {
-            JOptionPane.showMessageDialog(null, "✅ Canción actualizada correctamente.");
+            JOptionPane.showMessageDialog(null, "Canción actualizada correctamente.");
         } else {
-            JOptionPane.showMessageDialog(null, "❌ No se pudo actualizar la canción.");
+            JOptionPane.showMessageDialog(null, "No se pudo actualizar la canción.");
         }
 
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, "❌ Número inválido ingresado.");
+        JOptionPane.showMessageDialog(null, "Número inválido ingresado.");
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "❌ Error: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
     }};
 
 
