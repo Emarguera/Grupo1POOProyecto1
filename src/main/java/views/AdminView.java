@@ -5,86 +5,154 @@ import enums.Genre;
 import models.Song;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.util.List;
 
 public class AdminView {
 
     private AdminController adminController;
 
+    private JFrame frame;
+    private JList<String> catalogList;
+    private DefaultListModel<String> catalogModel;
+
+    private JButton addSongButton;
+    private JButton removeSongButton;
+    private JButton logoutButton;
+
     public AdminView(AdminController adminController) {
         this.adminController = adminController;
+        initialize();
+        loadCatalog();
     }
 
-    public void show() {
-        String[] options = {"Show Songs", "Add Song", "Remove Song", "Exit"};
-        while (true) {
-            int choice = JOptionPane.showOptionDialog(null, "Admin Menu", "Admin",
-                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-                    options, options[0]);
+    private void initialize() {
+        frame = new JFrame("Admin Panel - Music System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(700, 500);
+        frame.setLocationRelativeTo(null);
 
-            if (choice == 0) {
-                displaySongs();
-            } else if (choice == 1) {
-                addSong();
-            } else if (choice == 2) {
-                removeSong();
-            } else {
-                break;
-            }
-        }
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        frame.setContentPane(mainPanel);
+
+        JLabel catalogLabel = new JLabel("Songs Catalog");
+        catalogLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        mainPanel.add(catalogLabel, BorderLayout.NORTH);
+
+        catalogModel = new DefaultListModel<>();
+        catalogList = new JList<>(catalogModel);
+        catalogList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(catalogList);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        addSongButton = new JButton("Add Song");
+        removeSongButton = new JButton("Remove Selected Song");
+        logoutButton = new JButton("Logout");
+
+        buttonsPanel.add(addSongButton);
+        buttonsPanel.add(removeSongButton);
+        buttonsPanel.add(logoutButton);
+
+        addSongButton.addActionListener(e -> addSong());
+        removeSongButton.addActionListener(e -> removeSelectedSong());
+        logoutButton.addActionListener(e -> logout());
+
+        // Disable remove button if no selection
+        removeSongButton.setEnabled(false);
+        catalogList.addListSelectionListener(e -> {
+            removeSongButton.setEnabled(catalogList.getSelectedIndex() != -1);
+        });
     }
 
-    private void displaySongs() {
-        List<Song> songs = adminController.getCatalogSongs(); // Correct method
-
-        if (songs.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No songs available.");
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder("Songs List:\n");
+    private void loadCatalog() {
+        catalogModel.clear();
+        List<Song> songs = adminController.getCatalogSongs();
         for (Song song : songs) {
-            sb.append(song.toString()).append("\n");
+            catalogModel.addElement(formatSongDisplay(song));
         }
-        JOptionPane.showMessageDialog(null, sb.toString());
+    }
+
+    private String formatSongDisplay(Song song) {
+        return String.format("%s - %s [%s] $%.2f (Genre: %s, Purchases: %d)", 
+                song.getId(), song.getTitle(), song.getArtist(), song.getPrice(), song.getGenre(), song.getPurchaseCount());
     }
 
     private void addSong() {
-        try {
-            String id = JOptionPane.showInputDialog("Enter Song ID (3 digits):");
-            String title = JOptionPane.showInputDialog("Enter Song Title:");
-            String artist = JOptionPane.showInputDialog("Enter Artist Name:");
-            String priceStr = JOptionPane.showInputDialog("Enter Price:");
-            String[] genres = {"REGGAE", "HIPHOP", "CLASSICAL", "ROCK", "POP", "METAL"};
-            String genreStr = (String) JOptionPane.showInputDialog(null, "Select Genre:", "Genre",
-                    JOptionPane.QUESTION_MESSAGE, null, genres, genres[0]);
+        JTextField idField = new JTextField();
+        JTextField titleField = new JTextField();
+        JTextField artistField = new JTextField();
+        JTextField priceField = new JTextField();
+        JComboBox<Genre> genreComboBox = new JComboBox<>(Genre.values());
 
-            double price = Double.parseDouble(priceStr);
-            Genre genre = Genre.valueOf(genreStr);
+        Object[] inputs = {
+                "ID (3-digit):", idField,
+                "Title:", titleField,
+                "Artist:", artistField,
+                "Price:", priceField,
+                "Genre:", genreComboBox
+        };
 
-            boolean success = adminController.addSong(id, title, artist, price, genre);
+        int result = JOptionPane.showConfirmDialog(frame, inputs, "Add New Song", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String id = idField.getText().trim();
+                String title = titleField.getText().trim();
+                String artist = artistField.getText().trim();
+                double price = Double.parseDouble(priceField.getText().trim());
+                Genre genre = (Genre) genreComboBox.getSelectedItem();
 
-            if (success) {
-                JOptionPane.showMessageDialog(null, "Song added successfully!");
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to add song.");
+                if (id.isEmpty() || title.isEmpty() || artist.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                boolean success = adminController.addSong(id, title, artist, price, genre);
+                if (success) {
+                    JOptionPane.showMessageDialog(frame, "Song added successfully!");
+                    loadCatalog();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Failed to add song. Check if ID is unique.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Invalid price format.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Invalid input. Please try again.");
         }
     }
 
-    private void removeSong() {
-        String id = JOptionPane.showInputDialog("Enter Song ID to remove:");
-        if (id != null && !id.trim().isEmpty()) {
-            boolean success = adminController.removeSong(id.trim());
+    private void removeSelectedSong() {
+        int selectedIndex = catalogList.getSelectedIndex();
+        if (selectedIndex == -1) return;
+
+        Song song = adminController.getCatalogSongs().get(selectedIndex);
+
+        int confirm = JOptionPane.showConfirmDialog(frame,
+                "Are you sure you want to delete the song: " + song.getTitle() + "?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean success = adminController.removeSong(song.getId());
             if (success) {
-                JOptionPane.showMessageDialog(null, "Song removed successfully!");
+                JOptionPane.showMessageDialog(frame, "Song removed successfully.");
+                loadCatalog();
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to remove song.");
+                JOptionPane.showMessageDialog(frame, "Failed to remove song.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "Invalid Song ID.");
         }
+    }
+
+    private void logout() {
+        frame.dispose();
+        WelcomeView welcomeView = new WelcomeView();
+        welcomeView.show();
+    }
+
+    public void show() {
+        frame.setVisible(true);
     }
 }
