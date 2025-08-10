@@ -55,6 +55,10 @@ public class RegisteredUser extends User {
         return purchasedSongs;
     }
 
+    public void setPurchasedSongs(List<Song> purchasedSongs) {
+        this.purchasedSongs = purchasedSongs;
+    }
+
     public void purchaseSong(Song song) {
         if (!purchasedSongs.contains(song)) {
             purchasedSongs.add(song);
@@ -62,3 +66,4 @@ public class RegisteredUser extends User {
         }
     }
 }
+

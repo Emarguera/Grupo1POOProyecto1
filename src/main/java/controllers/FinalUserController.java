@@ -1,9 +1,13 @@
 package controllers;
 
+import dao.PurchaseDAO;
+import dao.PlaylistDAO;
+import dao.RegisteredUserDAO;
+import dao.SongDAO;
+
 import models.Catalog;
 import models.RegisteredUser;
 import models.Song;
-import services.Top5Manager;
 
 import java.util.List;
 
@@ -11,10 +15,27 @@ public class FinalUserController {
 
     private RegisteredUser user;
     private Catalog catalog;
+    private PurchaseDAO purchaseDAO;
+    private PlaylistDAO playlistDAO;
+    private SongDAO songDAO;
+    private RegisteredUserDAO userDAO;
 
     public FinalUserController(RegisteredUser user) {
         this.user = user;
-        this.catalog = Catalog.getInstance();  // Fixed here
+        this.catalog = Catalog.getInstance();
+
+        this.purchaseDAO = new PurchaseDAO();
+        this.playlistDAO = new PlaylistDAO();
+        this.songDAO = new SongDAO();
+        this.userDAO = new RegisteredUserDAO();
+
+        // Load user's purchased songs from DB on initialization
+        loadPurchasedSongs();
+    }
+
+    private void loadPurchasedSongs() {
+        List<Song> purchasedSongsFromDb = purchaseDAO.listPurchasedSongs(user.getId());
+        user.setPurchasedSongs(purchasedSongsFromDb);
     }
 
     public List<Song> getCatalogSongs() {
@@ -24,13 +45,18 @@ public class FinalUserController {
     public boolean purchaseSong(String songId) {
         Song song = catalog.findById(songId);
         if (song != null && !user.getPurchasedSongs().contains(song) && user.getBalance() >= song.getPrice()) {
-            user.purchaseSong(song);
-            user.setBalance(user.getBalance() - song.getPrice());
+            // Persist purchase in DB
+            boolean success = purchaseDAO.purchaseSong(user.getId(), songId);
+            if (success) {
+                user.purchaseSong(song);               // update local state
+                user.setBalance(user.getBalance() - song.getPrice());
+                userDAO.updateRegisteredUser(user);   // persist updated balance
 
-            // Instead of Top5Manager.recordPurchase(), call directly:
-            song.incrementPurchase();
+                song.incrementPurchase();
+                songDAO.updateSong(song);              // persist updated purchase count
 
-            return true;
+                return true;
+            }
         }
         return false;
     }
@@ -39,11 +65,7 @@ public class FinalUserController {
         Song song = catalog.findById(songId);
         if (song != null && user.getPurchasedSongs().contains(song)) {
             song.addRating(rating);
-
-            // Instead of Top5Manager.recordRating()
-            // No separate method needed since rating is added directly on song
-
-            return true;
+            return songDAO.updateSong(song);
         }
         return false;
     }
@@ -53,10 +75,15 @@ public class FinalUserController {
         if (song != null) {
             boolean added = user.getPlaylist().addSong(song);
             if (added) {
-                // Instead of Top5Manager.recordPlaylistAdd()
-                song.incrementPlaylistAdd();
+                boolean persisted = playlistDAO.addSongToPlaylist(user.getPlaylist().getId(), songId);
+                if (persisted) {
+                    song.incrementPlaylistAdd();
+                    songDAO.updateSong(song);
+                    return true;
+                } else {
+                    user.getPlaylist().removeSong(song); // rollback local add
+                }
             }
-            return added;
         }
         return false;
     }
@@ -64,7 +91,15 @@ public class FinalUserController {
     public boolean removeSongFromPlaylist(String songId) {
         Song song = catalog.findById(songId);
         if (song != null) {
-            return user.getPlaylist().removeSong(song);
+            boolean removed = user.getPlaylist().removeSong(song);
+            if (removed) {
+                boolean persisted = playlistDAO.removeSongFromPlaylist(user.getPlaylist().getId(), songId);
+                if (persisted) {
+                    return true;
+                } else {
+                    user.getPlaylist().addSong(song); // rollback local remove
+                }
+            }
         }
         return false;
     }

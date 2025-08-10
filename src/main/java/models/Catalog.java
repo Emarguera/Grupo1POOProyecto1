@@ -1,5 +1,6 @@
 package models;
 
+import dao.SongDAO;
 import enums.Genre;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class Catalog {
 
     private Catalog() {
         songs = new ArrayList<>();
+        loadSongsFromDB();
     }
 
     public static Catalog getInstance() {
@@ -24,6 +26,22 @@ public class Catalog {
             instance = new Catalog();
         }
         return instance;
+    }
+
+    public void loadSongsFromDB() {
+        SongDAO songDAO = new SongDAO();
+        List<Song> loadedSongs = songDAO.listAllSongs();  // <-- use listAllSongs() to load all songs
+        if (loadedSongs != null) {
+            songs = new ArrayList<>(loadedSongs);
+
+            // Update songIdCounter to avoid ID conflicts if using numeric IDs
+            songIdCounter = songs.stream()
+                                 .map(Song::getId)
+                                 .filter(id -> id.matches("\\d+")) // only numeric IDs
+                                 .mapToInt(Integer::parseInt)
+                                 .max()
+                                 .orElse(99) + 1;
+        }
     }
 
     public boolean addSong(String title, String artist, double price, Genre genre) {

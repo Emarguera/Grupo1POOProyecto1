@@ -6,15 +6,15 @@ import enums.Nationality;
 import models.Admin;
 import models.RegisteredUser;
 import utils.LoginUtils;
+import dao.AdminDAO;
+import dao.RegisteredUserDAO;
 
 import javax.swing.JOptionPane;
-import java.util.ArrayList;
-import java.util.List;
 
 public class WelcomeView {
 
-    private List<Admin> admins = new ArrayList<>(); // Initialize or load from DB
-    private List<RegisteredUser> registeredUsers = new ArrayList<>(); // Load from DB or session
+    private AdminDAO adminDAO = new AdminDAO();
+    private RegisteredUserDAO registeredUserDAO = new RegisteredUserDAO();
 
     public void show() {
         String[] options = {"Login", "Register"};
@@ -25,7 +25,7 @@ public class WelcomeView {
             login();
         } else if (choice == 1) {
             UserRegistrationView registrationView = new UserRegistrationView();
-            registrationView.show();  // FIXED here from display() to show()
+            registrationView.show();
             show(); // After registration return here to login
         } else {
             System.exit(0);
@@ -36,22 +36,20 @@ public class WelcomeView {
         String email = JOptionPane.showInputDialog("Enter Email:");
         String password = JOptionPane.showInputDialog("Enter Password:");
 
-        for (Admin admin : admins) {
-            if (LoginUtils.credentialsMatch(admin, email, password)) {
-                AdminController adminController = new AdminController(admin);
-                AdminView adminView = new AdminView(adminController);
-                adminView.show();
-                return;
-            }
+        Admin admin = adminDAO.getAdminByEmail(email);
+        if (admin != null && LoginUtils.credentialsMatch(admin, email, password)) {
+            AdminController adminController = new AdminController(admin);
+            AdminView adminView = new AdminView(adminController);
+            adminView.show();
+            return;
         }
 
-        for (RegisteredUser user : registeredUsers) {
-            if (LoginUtils.credentialsMatch(user, email, password)) {
-                FinalUserController userController = new FinalUserController(user);
-                RegisteredUserView userView = new RegisteredUserView(userController);
-                userView.show();
-                return;
-            }
+        RegisteredUser user = registeredUserDAO.getRegisteredUserByEmail(email);
+        if (user != null && LoginUtils.credentialsMatch(user, email, password)) {
+            FinalUserController userController = new FinalUserController(user);
+            RegisteredUserView userView = new RegisteredUserView(userController);
+            userView.show();
+            return;
         }
 
         JOptionPane.showMessageDialog(null, "Invalid credentials. Please try again.");

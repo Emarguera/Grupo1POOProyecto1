@@ -4,7 +4,7 @@ import controllers.AdminController;
 import enums.Genre;
 import models.Song;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import java.util.List;
 
 public class AdminView {
@@ -16,75 +16,75 @@ public class AdminView {
     }
 
     public void show() {
-        String[] options = {"View Catalog", "Add Song", "Remove Song", "Logout"};
+        String[] options = {"Show Songs", "Add Song", "Remove Song", "Exit"};
         while (true) {
             int choice = JOptionPane.showOptionDialog(null, "Admin Menu", "Admin",
-                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                    options, options[0]);
 
-            switch (choice) {
-                case 0:
-                    viewCatalog();
-                    break;
-                case 1:
-                    addSong();
-                    break;
-                case 2:
-                    removeSong();
-                    break;
-                case 3:
-                default:
-                    return;
+            if (choice == 0) {
+                displaySongs();
+            } else if (choice == 1) {
+                addSong();
+            } else if (choice == 2) {
+                removeSong();
+            } else {
+                break;
             }
         }
     }
 
-    public void viewCatalog() {
-        List<Song> songs = adminController.getCatalogSongs();
+    private void displaySongs() {
+        List<Song> songs = adminController.getCatalogSongs(); // Correct method
+
         if (songs.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "The catalog is empty.");
+            JOptionPane.showMessageDialog(null, "No songs available.");
             return;
         }
 
-        StringBuilder sb = new StringBuilder("Catalog:\n");
+        StringBuilder sb = new StringBuilder("Songs List:\n");
         for (Song song : songs) {
-            sb.append(song).append("\n");
+            sb.append(song.toString()).append("\n");
         }
         JOptionPane.showMessageDialog(null, sb.toString());
     }
 
     private void addSong() {
-        String title = JOptionPane.showInputDialog("Enter song title:");
-        String artist = JOptionPane.showInputDialog("Enter artist:");
-        String priceStr = JOptionPane.showInputDialog("Enter price:");
-        double price;
         try {
-            price = Double.parseDouble(priceStr);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid price.");
-            return;
-        }
-        Genre genre = (Genre) JOptionPane.showInputDialog(null, "Select genre:",
-                "Genre", JOptionPane.QUESTION_MESSAGE, null, Genre.values(), Genre.POP); // Case fixed here
+            String id = JOptionPane.showInputDialog("Enter Song ID (3 digits):");
+            String title = JOptionPane.showInputDialog("Enter Song Title:");
+            String artist = JOptionPane.showInputDialog("Enter Artist Name:");
+            String priceStr = JOptionPane.showInputDialog("Enter Price:");
+            String[] genres = {"REGGAE", "HIPHOP", "CLASSICAL", "ROCK", "POP", "METAL"};
+            String genreStr = (String) JOptionPane.showInputDialog(null, "Select Genre:", "Genre",
+                    JOptionPane.QUESTION_MESSAGE, null, genres, genres[0]);
 
-        if (title != null && artist != null && genre != null) {
-            boolean success = adminController.addSong(title, artist, price, genre);
+            double price = Double.parseDouble(priceStr);
+            Genre genre = Genre.valueOf(genreStr);
+
+            boolean success = adminController.addSong(id, title, artist, price, genre);
+
             if (success) {
-                JOptionPane.showMessageDialog(null, "Song added successfully.");
+                JOptionPane.showMessageDialog(null, "Song added successfully!");
             } else {
                 JOptionPane.showMessageDialog(null, "Failed to add song.");
             }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Please try again.");
         }
     }
 
     private void removeSong() {
-        String songId = JOptionPane.showInputDialog("Enter Song ID to remove:");
-        if (songId != null) {
-            boolean success = adminController.removeSong(songId);
+        String id = JOptionPane.showInputDialog("Enter Song ID to remove:");
+        if (id != null && !id.trim().isEmpty()) {
+            boolean success = adminController.removeSong(id.trim());
             if (success) {
-                JOptionPane.showMessageDialog(null, "Song removed successfully.");
+                JOptionPane.showMessageDialog(null, "Song removed successfully!");
             } else {
-                JOptionPane.showMessageDialog(null, "Song not found.");
+                JOptionPane.showMessageDialog(null, "Failed to remove song.");
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid Song ID.");
         }
     }
 }
