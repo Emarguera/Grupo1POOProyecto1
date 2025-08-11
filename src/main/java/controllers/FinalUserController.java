@@ -17,7 +17,6 @@ public class FinalUserController {
         this.delegate = new RegisteredUserController(user);
     }
 
-    // Delegate methods used by RegisteredUserView
     public List<Song> getCatalogSongs() {
         return delegate.getCatalogSongs();
     }
@@ -46,8 +45,12 @@ public class FinalUserController {
         return delegate.getPlaylistSongs();
     }
 
-    // New: create playlist
     public boolean createPlaylist(String name) {
         return delegate.createPlaylist(name);
+    }
+
+    // New: expose current balance
+    public double getBalance() {
+        return delegate.getBalance();
     }
 }

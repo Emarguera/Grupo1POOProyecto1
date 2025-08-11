@@ -31,9 +31,6 @@ public class RegisteredUserController {
 
         // Load user's purchased songs from DB on initialization
         loadPurchasedSongs();
-
-        // If user has a playlist already persisted, try to load it
-        // Note: your PlaylistDAO#getPlaylistById requires an id; we create playlist when the user requests it.
     }
 
     private void loadPurchasedSongs() {
@@ -48,16 +45,13 @@ public class RegisteredUserController {
     public boolean purchaseSong(String songId) {
         Song song = catalog.findById(songId);
         if (song != null && !user.getPurchasedSongs().contains(song) && user.getBalance() >= song.getPrice()) {
-            // Persist purchase in DB
             boolean success = purchaseDAO.purchaseSong(user.getId(), songId);
             if (success) {
-                user.purchaseSong(song);               // update local state
+                user.purchaseSong(song);
                 user.setBalance(user.getBalance() - song.getPrice());
-                userDAO.updateRegisteredUser(user);   // persist updated balance
-
+                userDAO.updateRegisteredUser(user);
                 song.incrementPurchase();
-                songDAO.updateSong(song);              // persist updated purchase count
-
+                songDAO.updateSong(song);
                 return true;
             }
         }
@@ -73,46 +67,26 @@ public class RegisteredUserController {
         return false;
     }
 
-    /**
-     * Create a playlist for the user (single playlist model).
-     * Returns true if created and persisted successfully.
-     */
     public boolean createPlaylist(String name) {
         if (name == null || name.trim().isEmpty()) return false;
+        if (user.getPlaylist() != null && user.getPlaylist().getId() > 0) return false;
 
-        // If user already has a playlist with id > 0 treat as already created
-        if (user.getPlaylist() != null && user.getPlaylist().getId() > 0) {
-            return false; // already has a playlist
-        }
-
-        // prepare playlist model and persist
         Playlist p = new Playlist();
         p.setOwnerId(user.getId());
         p.setName(name);
 
         int generatedId = playlistDAO.createPlaylist(p);
         if (generatedId > 0) {
-            // attach to user
             user.setPlaylist(p);
             return true;
         }
-
         return false;
     }
 
-    /**
-     * Add a purchased song to the user's playlist.
-     * Only allows songs that the user actually purchased.
-     */
     public boolean addSongToPlaylist(String songId) {
-        // Ensure playlist exists
         Playlist userPlaylist = user.getPlaylist();
-        if (userPlaylist == null || userPlaylist.getId() <= 0) {
-            // No playlist created yet
-            return false;
-        }
+        if (userPlaylist == null || userPlaylist.getId() <= 0) return false;
 
-        // Make sure the song is a purchased song
         Song purchasedMatch = null;
         for (Song s : user.getPurchasedSongs()) {
             if (s.getId().equals(songId)) {
@@ -120,22 +94,16 @@ public class RegisteredUserController {
                 break;
             }
         }
-        if (purchasedMatch == null) {
-            // song not purchased by user
-            return false;
-        }
+        if (purchasedMatch == null) return false;
 
-        // add locally
         boolean added = userPlaylist.addSong(purchasedMatch);
         if (added) {
             boolean persisted = playlistDAO.addSongToPlaylist(userPlaylist.getId(), songId);
             if (persisted) {
-                // update song stat
                 purchasedMatch.incrementPlaylistAdd();
                 songDAO.updateSong(purchasedMatch);
                 return true;
             } else {
-                // rollback local add
                 userPlaylist.removeSong(purchasedMatch);
             }
         }
@@ -144,11 +112,8 @@ public class RegisteredUserController {
 
     public boolean removeSongFromPlaylist(String songId) {
         Playlist userPlaylist = user.getPlaylist();
-        if (userPlaylist == null || userPlaylist.getId() <= 0) {
-            return false;
-        }
+        if (userPlaylist == null || userPlaylist.getId() <= 0) return false;
 
-        // find corresponding Song object (preferably from playlist)
         Song toRemove = null;
         for (Song s : userPlaylist.getSongs()) {
             if (s.getId().equals(songId)) {
@@ -161,12 +126,8 @@ public class RegisteredUserController {
         boolean removed = userPlaylist.removeSong(toRemove);
         if (removed) {
             boolean persisted = playlistDAO.removeSongFromPlaylist(userPlaylist.getId(), songId);
-            if (persisted) {
-                return true;
-            } else {
-                // rollback
-                userPlaylist.addSong(toRemove);
-            }
+            if (persisted) return true;
+            else userPlaylist.addSong(toRemove);
         }
         return false;
     }
@@ -179,5 +140,10 @@ public class RegisteredUserController {
         Playlist p = user.getPlaylist();
         if (p == null) return List.of();
         return p.getSongs();
+    }
+
+    // New: expose balance for the view
+    public double getBalance() {
+        return user.getBalance();
     }
 }

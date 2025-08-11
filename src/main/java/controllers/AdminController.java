@@ -42,13 +42,22 @@ public class AdminController {
         return deleted;
     }
 
-    // Registered users (only active)
+    // Registered users (active)
     public List<RegisteredUser> getRegisteredUsers() {
         return registeredUserDAO.getAllRegisteredUsers(); // active only
     }
 
     public boolean deleteRegisteredUser(String id) {
-        // soft delete via package
+        // soft-delete via package
         return registeredUserDAO.deleteRegisteredUser(id);
+    }
+
+    // Add balance to a registered user (additive)
+    public boolean addBalanceToUser(String userId, double amountToAdd) {
+        if (amountToAdd < 0) return false;
+        RegisteredUser u = registeredUserDAO.getRegisteredUserById(userId);
+        if (u == null) return false;
+        u.setBalance(u.getBalance() + amountToAdd);
+        return registeredUserDAO.updateRegisteredUser(u);
     }
 }

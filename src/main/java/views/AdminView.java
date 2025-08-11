@@ -4,11 +4,14 @@ import controllers.AdminController;
 import enums.Genre;
 import models.Song;
 import models.RegisteredUser;
+import services.Top5Manager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class AdminView {
 
@@ -26,8 +29,14 @@ public class AdminView {
     private JList<String> usersList;
     private DefaultListModel<String> usersModel;
     private JButton deleteUserButton;
+    private JButton addBalanceButton;
+
+    // Top 5
+    private JButton viewTop5Button;
 
     private JButton logoutButton;
+
+    private final NumberFormat currencyFmt = NumberFormat.getCurrencyInstance(Locale.US);
 
     public AdminView(AdminController adminController) {
         this.adminController = adminController;
@@ -39,19 +48,35 @@ public class AdminView {
     private void initialize() {
         frame = new JFrame("Admin Panel - Music System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 520);
+        frame.setSize(980, 560);
         frame.setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         frame.setContentPane(mainPanel);
 
+        JPanel header = new JPanel(new BorderLayout());
         JLabel titleLabel = new JLabel("Admin Panel - Music System");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        header.add(titleLabel, BorderLayout.WEST);
+
+        // Top 5 button in the header
+        JPanel headerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        viewTop5Button = new JButton("View Top 5");
+        viewTop5Button.addActionListener(e -> showTop5Dialog());
+        headerButtons.add(viewTop5Button);
+
+        logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(e -> logout());
+        headerButtons.add(logoutButton);
+
+        header.add(headerButtons, BorderLayout.EAST);
+
+        mainPanel.add(header, BorderLayout.NORTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(540);
+        splitPane.setDividerLocation(560);
         mainPanel.add(splitPane, BorderLayout.CENTER);
 
         // Left: Catalog
@@ -71,7 +96,6 @@ public class AdminView {
         catalogBtns.add(addSongButton);
         catalogBtns.add(removeSongButton);
         catalogPanel.add(catalogBtns, BorderLayout.SOUTH);
-
         splitPane.setLeftComponent(catalogPanel);
 
         // Right: Users
@@ -87,8 +111,10 @@ public class AdminView {
 
         JPanel usersBtns = new JPanel(new FlowLayout(FlowLayout.LEFT));
         deleteUserButton = new JButton("Delete Selected User");
+        addBalanceButton = new JButton("Add Balance");
         logoutButton = new JButton("Logout");
         usersBtns.add(deleteUserButton);
+        usersBtns.add(addBalanceButton);
         usersBtns.add(logoutButton);
         usersPanel.add(usersBtns, BorderLayout.SOUTH);
 
@@ -98,11 +124,13 @@ public class AdminView {
         addSongButton.addActionListener(e -> addSong());
         removeSongButton.addActionListener(e -> removeSelectedSong());
         deleteUserButton.addActionListener(e -> deleteSelectedUser());
+        addBalanceButton.addActionListener(e -> addBalanceToSelectedUser());
         logoutButton.addActionListener(e -> logout());
 
         // Enable/disable
         removeSongButton.setEnabled(false);
         deleteUserButton.setEnabled(false);
+        addBalanceButton.setEnabled(false);
 
         catalogList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -112,7 +140,9 @@ public class AdminView {
 
         usersList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                deleteUserButton.setEnabled(usersList.getSelectedIndex() != -1);
+                boolean sel = usersList.getSelectedIndex() != -1;
+                deleteUserButton.setEnabled(sel);
+                addBalanceButton.setEnabled(sel);
             }
         });
     }
@@ -129,15 +159,16 @@ public class AdminView {
         usersModel.clear();
         List<RegisteredUser> users = adminController.getRegisteredUsers();
         for (RegisteredUser u : users) {
-            usersModel.addElement(String.format("%s - %s %s (%s)",
-                    u.getId(), u.getName(), u.getLastName(), u.getEmail()));
+            usersModel.addElement(String.format("%s - %s %s (%s)  | Balance: %s",
+                    u.getId(), u.getName(), u.getLastName(), u.getEmail(), currencyFmt.format(u.getBalance())));
         }
     }
 
     private String formatSongDisplay(Song song) {
-        return String.format("%s - %s [%s] $%.2f (Genre: %s, Purchases: %d)",
-                song.getId(), song.getTitle(), song.getArtist(), song.getPrice(),
-                song.getGenre(), song.getPurchaseCount());
+        return String.format("%s - %s [%s] %s (Genre: %s, Purchases: %d, In Playlists: %d, Avg ★: %.2f)",
+                song.getId(), song.getTitle(), song.getArtist(),
+                currencyFmt.format(song.getPrice()), song.getGenre(),
+                song.getPurchaseCount(), song.getPlaylistCount(), song.getAverageRating());
     }
 
     private void addSong() {
@@ -224,6 +255,64 @@ public class AdminView {
                 JOptionPane.showMessageDialog(frame, "Failed to delete user.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    private void addBalanceToSelectedUser() {
+        int idx = usersList.getSelectedIndex();
+        if (idx == -1) return;
+
+        RegisteredUser u = adminController.getRegisteredUsers().get(idx);
+
+        String amountStr = JOptionPane.showInputDialog(frame, "Enter amount to ADD to balance (e.g., 10.00):");
+        if (amountStr == null) return;
+        try {
+            double amount = Double.parseDouble(amountStr.trim());
+            if (amount < 0) {
+                JOptionPane.showMessageDialog(frame, "Amount must be non-negative.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            boolean ok = adminController.addBalanceToUser(u.getId(), amount);
+            if (ok) {
+                JOptionPane.showMessageDialog(frame, "Balance updated.");
+                loadRegisteredUsers();
+            } else {
+                JOptionPane.showMessageDialog(frame, "Failed to update balance.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(frame, "Invalid amount.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showTop5Dialog() {
+        List<Song> mostPurchased = Top5Manager.getTop5MostPurchased();
+        List<Song> mostPlaylisted = Top5Manager.getTop5MostPlaylisted();
+        List<Song> highestRated = Top5Manager.getTop5HighestRated();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Top 5 Most Purchased:\n");
+        appendSongList(sb, mostPurchased, true, false, false);
+        sb.append("\nTop 5 Most Added to Playlists:\n");
+        appendSongList(sb, mostPlaylisted, false, true, false);
+        sb.append("\nTop 5 Best Rated:\n");
+        appendSongList(sb, highestRated, false, false, true);
+
+        JTextArea area = new JTextArea(sb.toString(), 20, 65);
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane scroll = new JScrollPane(area);
+        JOptionPane.showMessageDialog(frame, scroll, "Top 5", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void appendSongList(StringBuilder sb, List<Song> songs, boolean showPurch, boolean showPlaylist, boolean showRating) {
+        int i = 1;
+        for (Song s : songs) {
+            sb.append(String.format("%d) %s - %s | %s", i++, s.getTitle(), s.getArtist(), currencyFmt.format(s.getPrice())));
+            if (showPurch) sb.append(" | Purchases: ").append(s.getPurchaseCount());
+            if (showPlaylist) sb.append(" | In Playlists: ").append(s.getPlaylistCount());
+            if (showRating) sb.append(String.format(" | Avg ★: %.2f (%d votes)", s.getAverageRating(), s.getRatingCount()));
+            sb.append("\n");
+        }
+        if (songs.isEmpty()) sb.append("(no data)\n");
     }
 
     private void logout() {

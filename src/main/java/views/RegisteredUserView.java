@@ -1,19 +1,23 @@
 package views;
 
 import controllers.FinalUserController;
-import enums.Genre;
 import models.Song;
+import services.Top5Manager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class RegisteredUserView {
 
     private FinalUserController userController;
 
     private JFrame frame;
+    private JLabel balanceLabel;
+
     private JList<String> catalogList;
     private DefaultListModel<String> catalogModel;
 
@@ -28,7 +32,10 @@ public class RegisteredUserView {
     private JButton addToPlaylistButton;
     private JButton removeFromPlaylistButton;
     private JButton rateButton;
+    private JButton viewTop5Button;
     private JButton logoutButton;
+
+    private final NumberFormat currencyFmt = NumberFormat.getCurrencyInstance(Locale.US);
 
     public RegisteredUserView(FinalUserController userController) {
         this.userController = userController;
@@ -36,17 +43,18 @@ public class RegisteredUserView {
         loadCatalog();
         loadPurchasedSongs();
         loadPlaylistSongs();
+        refreshBalance();
     }
 
     private void initialize() {
         frame = new JFrame("Registered User - Music System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 600);
+        frame.setSize(980, 620);
         frame.setLocationRelativeTo(null);
 
         // Layout split pane for catalog on left, user controls on right
         JSplitPane splitPane = new JSplitPane();
-        splitPane.setDividerLocation(350);
+        splitPane.setDividerLocation(360);
         frame.getContentPane().add(splitPane);
 
         // Catalog panel (left)
@@ -54,9 +62,17 @@ public class RegisteredUserView {
         catalogPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         splitPane.setLeftComponent(catalogPanel);
 
+        JPanel leftHeader = new JPanel(new BorderLayout());
         JLabel catalogLabel = new JLabel("Song Catalog");
         catalogLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        catalogPanel.add(catalogLabel, BorderLayout.NORTH);
+        leftHeader.add(catalogLabel, BorderLayout.WEST);
+
+        // View Top 5 button in left header
+        viewTop5Button = new JButton("View Top 5");
+        viewTop5Button.addActionListener(e -> showTop5Dialog());
+        leftHeader.add(viewTop5Button, BorderLayout.EAST);
+
+        catalogPanel.add(leftHeader, BorderLayout.NORTH);
 
         catalogModel = new DefaultListModel<>();
         catalogList = new JList<>(catalogModel);
@@ -70,6 +86,13 @@ public class RegisteredUserView {
         rightPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         splitPane.setRightComponent(rightPanel);
 
+        // Balance header
+        JPanel balancePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        balanceLabel = new JLabel("Balance: " + currencyFmt.format(0));
+        balanceLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        balancePanel.add(balanceLabel);
+        rightPanel.add(balancePanel);
+
         // Purchased Songs section
         JLabel purchasedLabel = new JLabel("Purchased Songs");
         purchasedLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -79,7 +102,7 @@ public class RegisteredUserView {
         purchasedList = new JList<>(purchasedModel);
         purchasedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane purchasedScroll = new JScrollPane(purchasedList);
-        purchasedScroll.setPreferredSize(new Dimension(400, 150));
+        purchasedScroll.setPreferredSize(new Dimension(420, 150));
         rightPanel.add(purchasedScroll);
 
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -93,7 +116,7 @@ public class RegisteredUserView {
         playlistList = new JList<>(playlistModel);
         playlistList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane playlistScroll = new JScrollPane(playlistList);
-        playlistScroll.setPreferredSize(new Dimension(400, 150));
+        playlistScroll.setPreferredSize(new Dimension(420, 150));
         rightPanel.add(playlistScroll);
 
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -126,7 +149,7 @@ public class RegisteredUserView {
 
         // Disable buttons initially if nothing selected
         purchaseButton.setEnabled(false);
-        createPlaylistButton.setEnabled(true); // allow creating right away
+        createPlaylistButton.setEnabled(true);
         addToPlaylistButton.setEnabled(false);
         removeFromPlaylistButton.setEnabled(false);
         rateButton.setEnabled(false);
@@ -140,7 +163,7 @@ public class RegisteredUserView {
         purchasedList.addListSelectionListener(e -> {
             boolean selected = purchasedList.getSelectedIndex() != -1;
             rateButton.setEnabled(selected);
-            addToPlaylistButton.setEnabled(selected); // enable add-from-purchased
+            addToPlaylistButton.setEnabled(selected);
         });
 
         playlistList.addListSelectionListener(e -> {
@@ -173,9 +196,14 @@ public class RegisteredUserView {
         }
     }
 
+    private void refreshBalance() {
+        double bal = userController.getBalance();
+        balanceLabel.setText("Balance: " + currencyFmt.format(bal));
+    }
+
     private String formatSongDisplay(Song song) {
-        return String.format("%s - %s [%s] $%.2f (Rating: %.2f)", 
-            song.getId(), song.getTitle(), song.getArtist(), song.getPrice(), song.getAverageRating());
+        return String.format("%s - %s [%s] %s (Avg ★: %.2f)",
+                song.getId(), song.getTitle(), song.getArtist(), currencyFmt.format(song.getPrice()), song.getAverageRating());
     }
 
     private void purchaseSelectedSong() {
@@ -186,7 +214,8 @@ public class RegisteredUserView {
         if (userController.purchaseSong(song.getId())) {
             JOptionPane.showMessageDialog(frame, "Song purchased successfully!");
             loadPurchasedSongs();
-            loadCatalog(); // To reflect purchase count update if any
+            loadCatalog(); // reflect purchase count update
+            refreshBalance(); // reflect new balance
         } else {
             JOptionPane.showMessageDialog(frame, "Purchase failed. Maybe insufficient balance or already purchased.");
         }
@@ -208,7 +237,7 @@ public class RegisteredUserView {
     }
 
     private void addSelectedSongToPlaylist() {
-        int index = purchasedList.getSelectedIndex(); // <-- use purchased list
+        int index = purchasedList.getSelectedIndex();
         if (index == -1) return;
         Song song = userController.getPurchasedSongs().get(index);
 
@@ -255,6 +284,38 @@ public class RegisteredUserView {
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(frame, "Invalid rating input.");
         }
+    }
+
+    private void showTop5Dialog() {
+        List<Song> mostPurchased = Top5Manager.getTop5MostPurchased();
+        List<Song> mostPlaylisted = Top5Manager.getTop5MostPlaylisted();
+        List<Song> highestRated = Top5Manager.getTop5HighestRated();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Top 5 Most Purchased:\n");
+        appendSongList(sb, mostPurchased, true, false, false);
+        sb.append("\nTop 5 Most Added to Playlists:\n");
+        appendSongList(sb, mostPlaylisted, false, true, false);
+        sb.append("\nTop 5 Best Rated:\n");
+        appendSongList(sb, highestRated, false, false, true);
+
+        JTextArea area = new JTextArea(sb.toString(), 20, 65);
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane scroll = new JScrollPane(area);
+        JOptionPane.showMessageDialog(frame, scroll, "Top 5", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void appendSongList(StringBuilder sb, List<Song> songs, boolean showPurch, boolean showPlaylist, boolean showRating) {
+        int i = 1;
+        for (Song s : songs) {
+            sb.append(String.format("%d) %s - %s | %s", i++, s.getTitle(), s.getArtist(), currencyFmt.format(s.getPrice())));
+            if (showPurch) sb.append(" | Purchases: ").append(s.getPurchaseCount());
+            if (showPlaylist) sb.append(" | In Playlists: ").append(s.getPlaylistCount());
+            if (showRating) sb.append(String.format(" | Avg ★: %.2f (%d votes)", s.getAverageRating(), s.getRatingCount()));
+            sb.append("\n");
+        }
+        if (songs.isEmpty()) sb.append("(no data)\n");
     }
 
     private void logout() {
