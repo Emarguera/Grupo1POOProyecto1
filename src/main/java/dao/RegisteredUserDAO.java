@@ -4,6 +4,8 @@ import models.RegisteredUser;
 import enums.Nationality;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegisteredUserDAO {
 
@@ -29,7 +31,7 @@ public class RegisteredUserDAO {
         }
     }
 
-    // Read registered user by id (with OUT parameters)
+    // Read registered user by id (with OUT parameters) - returns null if inactive, per package
     public RegisteredUser getRegisteredUserById(String id) {
         String sql = "{call REGISTERED_USER_PKG.read_registered_user(?, ?, ?, ?, ?, ?, ?)}";
         try (Connection conn = ConexionOracle.conectar();
@@ -46,7 +48,7 @@ public class RegisteredUserDAO {
             stmt.execute();
 
             String name = stmt.getString(2);
-            if (name == null) return null; // no record
+            if (name == null) return null; // no record or inactive
 
             String lastName = stmt.getString(3);
             String email = stmt.getString(4);
@@ -64,9 +66,9 @@ public class RegisteredUserDAO {
         }
     }
 
-    // Get registered user by email (for login)
+    // Get registered user by email (for login) - excludes inactive users
     public RegisteredUser getRegisteredUserByEmail(String email) {
-        String sql = "SELECT id FROM registered_users WHERE email = ?";
+        String sql = "SELECT id FROM registered_users WHERE email = ? AND NVL(active,1) = 1";
         try (Connection conn = ConexionOracle.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -81,6 +83,27 @@ public class RegisteredUserDAO {
             System.err.println("Error fetching registered user by email: " + e.getMessage());
         }
         return null;
+    }
+
+    // List all ACTIVE registered users (for AdminView)
+    public List<RegisteredUser> getAllRegisteredUsers() {
+        List<RegisteredUser> users = new ArrayList<>();
+        String sql = "SELECT id FROM registered_users WHERE NVL(active,1) = 1 ORDER BY name";
+
+        try (Connection conn = ConexionOracle.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String id = rs.getString("id");
+                RegisteredUser user = getRegisteredUserById(id);
+                if (user != null) users.add(user);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error retrieving all registered users: " + e.getMessage());
+        }
+        return users;
     }
 
     // Update registered user
@@ -105,7 +128,7 @@ public class RegisteredUserDAO {
         }
     }
 
-    // Delete registered user
+    // Delete (soft delete via package)
     public boolean deleteRegisteredUser(String id) {
         String sql = "{call REGISTERED_USER_PKG.delete_registered_user(?)}";
         try (Connection conn = ConexionOracle.conectar();

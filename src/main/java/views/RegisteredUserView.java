@@ -6,11 +6,7 @@ import models.Song;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class RegisteredUserView {
@@ -28,6 +24,7 @@ public class RegisteredUserView {
     private DefaultListModel<String> playlistModel;
 
     private JButton purchaseButton;
+    private JButton createPlaylistButton;
     private JButton addToPlaylistButton;
     private JButton removeFromPlaylistButton;
     private JButton rateButton;
@@ -106,12 +103,14 @@ public class RegisteredUserView {
         rightPanel.add(buttonsPanel);
 
         purchaseButton = new JButton("Purchase Selected Song");
-        addToPlaylistButton = new JButton("Add to Playlist");
+        createPlaylistButton = new JButton("Create Playlist");
+        addToPlaylistButton = new JButton("Add Purchased Song to Playlist");
         removeFromPlaylistButton = new JButton("Remove from Playlist");
         rateButton = new JButton("Rate Purchased Song");
         logoutButton = new JButton("Logout");
 
         buttonsPanel.add(purchaseButton);
+        buttonsPanel.add(createPlaylistButton);
         buttonsPanel.add(addToPlaylistButton);
         buttonsPanel.add(removeFromPlaylistButton);
         buttonsPanel.add(rateButton);
@@ -119,6 +118,7 @@ public class RegisteredUserView {
 
         // Button actions
         purchaseButton.addActionListener(e -> purchaseSelectedSong());
+        createPlaylistButton.addActionListener(e -> createPlaylist());
         addToPlaylistButton.addActionListener(e -> addSelectedSongToPlaylist());
         removeFromPlaylistButton.addActionListener(e -> removeSelectedSongFromPlaylist());
         rateButton.addActionListener(e -> ratePurchasedSong());
@@ -126,6 +126,7 @@ public class RegisteredUserView {
 
         // Disable buttons initially if nothing selected
         purchaseButton.setEnabled(false);
+        createPlaylistButton.setEnabled(true); // allow creating right away
         addToPlaylistButton.setEnabled(false);
         removeFromPlaylistButton.setEnabled(false);
         rateButton.setEnabled(false);
@@ -134,12 +135,12 @@ public class RegisteredUserView {
         catalogList.addListSelectionListener(e -> {
             boolean selected = catalogList.getSelectedIndex() != -1;
             purchaseButton.setEnabled(selected);
-            addToPlaylistButton.setEnabled(selected);
         });
 
         purchasedList.addListSelectionListener(e -> {
             boolean selected = purchasedList.getSelectedIndex() != -1;
             rateButton.setEnabled(selected);
+            addToPlaylistButton.setEnabled(selected); // enable add-from-purchased
         });
 
         playlistList.addListSelectionListener(e -> {
@@ -191,16 +192,31 @@ public class RegisteredUserView {
         }
     }
 
+    private void createPlaylist() {
+        String name = JOptionPane.showInputDialog(frame, "Enter playlist name:");
+        if (name == null) return; // cancelled
+        if (name.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Playlist name cannot be empty.");
+            return;
+        }
+        if (userController.createPlaylist(name)) {
+            JOptionPane.showMessageDialog(frame, "Playlist created!");
+            loadPlaylistSongs();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Failed to create playlist (maybe one already exists).");
+        }
+    }
+
     private void addSelectedSongToPlaylist() {
-        int index = catalogList.getSelectedIndex();
+        int index = purchasedList.getSelectedIndex(); // <-- use purchased list
         if (index == -1) return;
-        Song song = userController.getCatalogSongs().get(index);
+        Song song = userController.getPurchasedSongs().get(index);
 
         if (userController.addSongToPlaylist(song.getId())) {
             JOptionPane.showMessageDialog(frame, "Song added to playlist!");
             loadPlaylistSongs();
         } else {
-            JOptionPane.showMessageDialog(frame, "Failed to add song to playlist.");
+            JOptionPane.showMessageDialog(frame, "Failed to add song to playlist. Make sure you created a playlist first and only add purchased songs.");
         }
     }
 

@@ -1,4 +1,4 @@
-package controllers;
+package models;
 
 import enums.Nationality;
 import models.RegisteredUser;

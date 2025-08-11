@@ -2,24 +2,32 @@ package views;
 
 import controllers.AdminController;
 import controllers.FinalUserController;
-import enums.Nationality;
+import dao.AdminDAO;
+import dao.LoginDAO;
+import dao.RegisteredUserDAO;
 import models.Admin;
 import models.RegisteredUser;
-import utils.LoginUtils;
-import dao.AdminDAO;
-import dao.RegisteredUserDAO;
 
 import javax.swing.JOptionPane;
 
 public class WelcomeView {
 
-    private AdminDAO adminDAO = new AdminDAO();
-    private RegisteredUserDAO registeredUserDAO = new RegisteredUserDAO();
+    private final AdminDAO adminDAO = new AdminDAO();
+    private final RegisteredUserDAO registeredUserDAO = new RegisteredUserDAO();
+    private final LoginDAO loginDAO = new LoginDAO();
 
     public void show() {
         String[] options = {"Login", "Register"};
-        int choice = JOptionPane.showOptionDialog(null, "Welcome to the Music System", "Welcome",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        int choice = JOptionPane.showOptionDialog(
+                null,
+                "Welcome to the Music System",
+                "Welcome",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
 
         if (choice == 0) {
             login();
@@ -36,23 +44,55 @@ public class WelcomeView {
         String email = JOptionPane.showInputDialog("Enter Email:");
         String password = JOptionPane.showInputDialog("Enter Password:");
 
-        Admin admin = adminDAO.getAdminByEmail(email);
-        if (admin != null && LoginUtils.credentialsMatch(admin, email, password)) {
-            AdminController adminController = new AdminController(admin);
-            AdminView adminView = new AdminView(adminController);
-            adminView.show();
+        // User cancelled one of the dialogs
+        if (email == null || password == null) {
+            show();
             return;
         }
 
-        RegisteredUser user = registeredUserDAO.getRegisteredUserByEmail(email);
-        if (user != null && LoginUtils.credentialsMatch(user, email, password)) {
-            FinalUserController userController = new FinalUserController(user);
-            RegisteredUserView userView = new RegisteredUserView(userController);
-            userView.show();
+        email = email.trim();
+        password = password.trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Email and password are required.");
+            show();
             return;
         }
 
-        JOptionPane.showMessageDialog(null, "Invalid credentials. Please try again.");
-        show();
+        // Ask the DB who this is
+        String role = loginDAO.checkLogin(email, password); // returns "ADMIN", "REGISTERED", or "INVALID"
+
+        switch (role) {
+            case "ADMIN" -> {
+                // Load full Admin from DB (by email)
+                Admin admin = adminDAO.getAdminByEmail(email);
+                if (admin == null) {
+                    JOptionPane.showMessageDialog(null, "Could not load admin profile. Please try again.");
+                    show();
+                    return;
+                }
+                AdminController adminController = new AdminController(admin);
+                AdminView adminView = new AdminView(adminController);
+                adminView.show();
+            }
+
+            case "REGISTERED" -> {
+                // Load full RegisteredUser from DB (by email); excludes inactive users
+                RegisteredUser user = registeredUserDAO.getRegisteredUserByEmail(email);
+                if (user == null) {
+                    JOptionPane.showMessageDialog(null, "Could not load user profile. Your account may be inactive.");
+                    show();
+                    return;
+                }
+                FinalUserController userController = new FinalUserController(user);
+                RegisteredUserView userView = new RegisteredUserView(userController);
+                userView.show();
+            }
+
+            default -> {
+                JOptionPane.showMessageDialog(null, "Invalid credentials. Please try again.");
+                show();
+            }
+        }
     }
 }
