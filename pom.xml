@@ -5,58 +5,83 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                         http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.mycompany</groupId>
-    <artifactId>Grupo1POOProyecto1</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany</groupId>
+  <artifactId>Grupo1POOProyecto1</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <build>
-        <plugins>
-            <!-- Compiler plugin with Java 24 and preview features enabled -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>24</release>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- JavaFX libraries version -->
+    <javafx.version>21.0.3</javafx.version>
+  </properties>
 
-            <!-- Exec plugin to run main class easily -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>system.MusicSystem</mainClass> <!-- Adjust if needed -->
-                    <commandlineArgs></commandlineArgs>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <dependencies>
+    <!-- Oracle JDBC -->
+    <dependency>
+      <groupId>com.oracle.database.jdbc</groupId>
+      <artifactId>ojdbc11</artifactId>
+      <version>21.9.0.0</version>
+      <type>jar</type>
+    </dependency>
 
-    <repositories>
-        <repository>
-            <id>oracle</id>
-            <url>https://maven.oracle.com</url>
-        </repository>
-    </repositories>
+    <!-- JavaFX (classpath, non-modular) -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+  </dependencies>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc11</artifactId>
-            <version>21.9.0.0</version>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+  <repositories>
+    <repository>
+      <id>oracle</id>
+      <url>https://maven.oracle.com</url>
+    </repository>
+  </repositories>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+  <build>
+    <plugins>
+      <!-- Java 24 + preview -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>24</release>
+          <compilerArgs>
+            <arg>--enable-preview</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
 
+      <!-- Optional: run via exec if you want -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <mainClass>systemfx.MainApp</mainClass>
+          <commandlineArgs>--enable-preview</commandlineArgs>
+        </configuration>
+      </plugin>
+
+            <!-- JavaFX Maven Plugin (use this to run the app) -->
+      <plugin>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-maven-plugin</artifactId>
+            <version>0.0.8</version>
+            <configuration>
+              <mainClass>systemfx.MainApp</mainClass>
+            </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>

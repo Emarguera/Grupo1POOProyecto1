@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:controller="viewsfx.AdminDashboardController" xmlns:fx="http://javafx.com/fxml">
+
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="header">
+            <Label text="Admin Dashboard" styleClass="title"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="Top 5" onAction="#onShowTop5"/>
+            <Button text="Logout" onAction="#onLogout"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Catalog">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="catalogTable">
+                                <columns>
+                                    <TableColumn text="ID" prefWidth="80" fx:id="colSongId"/>
+                                    <TableColumn text="Title" prefWidth="180" fx:id="colTitle"/>
+                                    <TableColumn text="Artist" prefWidth="150" fx:id="colArtist"/>
+                                    <TableColumn text="Genre" prefWidth="90" fx:id="colGenre"/>
+                                    <TableColumn text="Price" prefWidth="90" fx:id="colPrice"/>
+                                    <TableColumn text="Purchases" prefWidth="110" fx:id="colPurchases"/>
+                                    <TableColumn text="In Playlists" prefWidth="110" fx:id="colPlaylists"/>
+                                    <TableColumn text="Avg ★" prefWidth="90" fx:id="colAvgRating"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                       <bottom>
+    <HBox spacing="8">
+        <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        <Button text="Add Song" onAction="#onAddSong"/>
+        <Button text="Remove Selected" onAction="#onRemoveSong"/>
+    </HBox>
+</bottom>
+
+                    </BorderPane>
+                </Tab>
+
+                <Tab text="Users">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="usersTable">
+                                <columns>
+                                    <TableColumn text="ID" prefWidth="120" fx:id="colUserId"/>
+                                    <TableColumn text="Name" prefWidth="140" fx:id="colUserName"/>
+                                    <TableColumn text="Email" prefWidth="200" fx:id="colUserEmail"/>
+                                    <TableColumn text="Balance" prefWidth="100" fx:id="colUserBalance"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <bottom>
+    <HBox spacing="8">
+        <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        <Button text="Add Balance" onAction="#onAddBalance"/>
+        <Button text="Deactivate User" onAction="#onDeactivateUser"/>
+        <Label fx:id="statusLabel" />
+    </HBox>
+</bottom>
+
+                    </BorderPane>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

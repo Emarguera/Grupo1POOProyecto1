@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root" fx:controller="viewsfx.Top5DialogController" xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <Label text="Top 5" styleClass="sectionTitle">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        </Label>
+    </top>
+
+    <center>
+        <GridPane hgap="12" vgap="12">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+            <columnConstraints>
+                <ColumnConstraints percentWidth="33.3"/>
+                <ColumnConstraints percentWidth="33.3"/>
+                <ColumnConstraints percentWidth="33.4"/>
+            </columnConstraints>
+
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS"/>
+            </rowConstraints>
+
+            <!-- Most Purchased -->
+            <VBox GridPane.columnIndex="0" spacing="6">
+                <Label text="Most Purchased" styleClass="sectionTitle"/>
+                <TableView fx:id="tblPurchased">
+                    <columns>
+                        <TableColumn fx:id="colPIdx" text="#" prefWidth="40"/>
+                        <TableColumn fx:id="colPTitle" text="Title" prefWidth="160"/>
+                        <TableColumn fx:id="colPArtist" text="Artist" prefWidth="120"/>
+                        <TableColumn fx:id="colPPurchases" text="Purchases" prefWidth="90"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Most Added to Playlists -->
+            <VBox GridPane.columnIndex="1" spacing="6">
+                <Label text="Most Added to Playlists" styleClass="sectionTitle"/>
+                <TableView fx:id="tblPlaylisted">
+                    <columns>
+                        <TableColumn fx:id="colLIdx" text="#" prefWidth="40"/>
+                        <TableColumn fx:id="colLTitle" text="Title" prefWidth="160"/>
+                        <TableColumn fx:id="colLArtist" text="Artist" prefWidth="120"/>
+                        <TableColumn fx:id="colLCount" text="Adds" prefWidth="90"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Highest Rated -->
+            <VBox GridPane.columnIndex="2" spacing="6">
+                <Label text="Highest Rated" styleClass="sectionTitle"/>
+                <TableView fx:id="tblRated">
+                    <columns>
+                        <TableColumn fx:id="colRIdx" text="#" prefWidth="40"/>
+                        <TableColumn fx:id="colRTitle" text="Title" prefWidth="160"/>
+                        <TableColumn fx:id="colRArtist" text="Artist" prefWidth="120"/>
+                        <TableColumn fx:id="colRAvg" text="Avg ★" prefWidth="90"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </GridPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            <Button text="Close" onAction="#onClose"/>
+        </HBox>
+    </bottom>
+</BorderPane>

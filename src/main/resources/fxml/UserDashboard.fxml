@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:controller="viewsfx.UserDashboardController" xmlns:fx="http://javafx.com/fxml">
+
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="header">
+            <Label text="User Dashboard" styleClass="title"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Label text="Balance:"/>
+            <Label fx:id="balanceLabel" styleClass="badge"/>
+            <Button text="Top 5" onAction="#onShowTop5"/>
+            <Button text="Logout" onAction="#onLogout"/>
+        </HBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.45">
+            <items>
+
+                <!-- Catalog -->
+                <BorderPane>
+                    <top>
+  <Label text="Catalog" styleClass="sectionTitle">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+  </Label>
+</top>
+                    <center>
+                        <TableView fx:id="catalogTable">
+                            <columns>
+                                <TableColumn text="ID" prefWidth="80" fx:id="colSongId"/>
+                                <TableColumn text="Title" prefWidth="200" fx:id="colTitle"/>
+                                <TableColumn text="Artist" prefWidth="160" fx:id="colArtist"/>
+                                <TableColumn text="Price" prefWidth="90" fx:id="colPrice"/>
+                                <TableColumn text="Avg ★" prefWidth="90" fx:id="colAvgRating"/>
+                            </columns>
+                        </TableView>
+                    </center>
+                 <bottom>
+  <HBox spacing="8">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+    <Button text="Purchase Selected" onAction="#onPurchase"/>
+    <Button text="Create Playlist" onAction="#onCreatePlaylist"/>
+  </HBox>
+</bottom>
+                </BorderPane>
+
+                <!-- Right: Purchased/Playlist -->
+                <VBox spacing="10">
+                    <BorderPane>
+<top>
+  <Label text="Purchased" styleClass="sectionTitle">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+  </Label>
+</top>                        <center>
+                            <TableView fx:id="purchasedTable">
+                                <columns>
+                                    <TableColumn text="ID" prefWidth="80" fx:id="colPSongId"/>
+                                    <TableColumn text="Title" prefWidth="200" fx:id="colPTitle"/>
+                                    <TableColumn text="Artist" prefWidth="160" fx:id="colPArtist"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <bottom>
+  <HBox spacing="8">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+    <Button text="Rate Purchased" onAction="#onRatePurchased"/>
+    <Button text="Add to Playlist" onAction="#onAddToPlaylist"/>
+  </HBox>
+</bottom>
+                    </BorderPane>
+
+                    <BorderPane>
+<top>
+  <Label text="Playlist" styleClass="sectionTitle">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+  </Label>
+</top>                        <center>
+                            <TableView fx:id="playlistTable">
+                                <columns>
+                                    <TableColumn text="ID" prefWidth="80" fx:id="colLSongId"/>
+                                    <TableColumn text="Title" prefWidth="200" fx:id="colLTitle"/>
+                                    <TableColumn text="Artist" prefWidth="160" fx:id="colLArtist"/>
+                                </columns>
+                            </TableView>
+                        </center>
+<bottom>
+  <HBox spacing="8">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+    <Button text="Remove from Playlist" onAction="#onRemoveFromPlaylist"/>
+  </HBox>
+</bottom>
+                    </BorderPane>
+                </VBox>
+
+            </items>
+        </SplitPane>
+    </center>
+</BorderPane>

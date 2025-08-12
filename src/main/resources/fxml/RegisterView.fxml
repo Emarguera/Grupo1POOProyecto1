@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="viewsfx.RegisterController">
+
+    <!-- Header -->
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="header">
+            <Label text="Music System" styleClass="title"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="Back to Login" onAction="#onBackToLogin" minWidth="120"/>
+        </HBox>
+    </top>
+
+    <!-- Centered card -->
+    <center>
+        <VBox alignment="CENTER" spacing="18">
+            <padding>
+                <Insets top="40" right="20" bottom="40" left="20"/>
+            </padding>
+
+            <Label text="Create Account" styleClass="sectionTitle"/>
+
+            <!-- Card body -->
+            <VBox alignment="CENTER" spacing="14" maxWidth="440">
+
+                <!-- Name row -->
+                <HBox spacing="12" alignment="CENTER">
+                    <VBox spacing="4" alignment="CENTER_LEFT" maxWidth="210">
+                        <Label text="First name"/>
+                        <TextField fx:id="nameField" promptText="John" maxWidth="210"/>
+                    </VBox>
+
+                    <VBox spacing="4" alignment="CENTER_LEFT" maxWidth="210">
+                        <Label text="Last name"/>
+                        <TextField fx:id="lastNameField" promptText="Doe" maxWidth="210"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Email -->
+                <VBox spacing="4" alignment="CENTER_LEFT" maxWidth="430">
+                    <Label text="Email"/>
+                    <TextField fx:id="emailField" promptText="you@example.com" maxWidth="430"/>
+                </VBox>
+
+                <!-- Password -->
+                <VBox spacing="4" alignment="CENTER_LEFT" maxWidth="430">
+                    <Label text="Password"/>
+                    <PasswordField fx:id="passwordField" promptText="********" maxWidth="430"/>
+                </VBox>
+
+                <!-- ID -->
+                <VBox spacing="4" alignment="CENTER_LEFT" maxWidth="430">
+                    <Label text="ID (9 digits)"/>
+                    <TextField fx:id="idField" promptText="012345678" maxWidth="430"/>
+                </VBox>
+
+                <!-- Nationality -->
+                <VBox spacing="4" alignment="CENTER_LEFT" maxWidth="430">
+                    <Label text="Nationality"/>
+                    <ComboBox fx:id="nationalityBox" promptText="Select nationality" maxWidth="430"/>
+                </VBox>
+
+                <!-- Buttons -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Button fx:id="registerBtn" text="Register" onAction="#onRegister" minWidth="120" disable="true"/>
+                    <Button text="Cancel" onAction="#onBackToLogin" minWidth="120"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="© 2025 Music System POO"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
